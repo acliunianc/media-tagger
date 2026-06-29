@@ -37,6 +37,7 @@ pub fn run() {
             commands::suggest_tags,
             commands::rename_tag,
             commands::delete_tag_global,
+            commands::batch_delete_tags,
             commands::reconcile_files,
             commands::start_scan,
             commands::pause_scan,

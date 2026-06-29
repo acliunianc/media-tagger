@@ -52,6 +52,10 @@ export async function deleteTagGlobal(tagName: string): Promise<void> {
   return invoke("delete_tag_global", { tagName });
 }
 
+export async function batchDeleteTags(tagNames: string[]): Promise<number> {
+  return invoke("batch_delete_tags", { tagNames });
+}
+
 export async function reconcileFiles(): Promise<number> {
   return invoke("reconcile_files");
 }

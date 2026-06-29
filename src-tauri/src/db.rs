@@ -383,6 +383,22 @@ impl Database {
         Ok(())
     }
 
+    pub fn batch_delete_tags(&self, tag_names: &[String]) -> Result<usize, DbError> {
+        let mut deleted = 0usize;
+        for name in tag_names {
+            let name = name.trim();
+            if name.is_empty() {
+                continue;
+            }
+            let count = self.conn.execute(
+                "DELETE FROM tags WHERE name = ?1",
+                params![name],
+            )?;
+            deleted += count;
+        }
+        Ok(deleted)
+    }
+
     pub fn list_tags(&self) -> Result<Vec<TagInfo>, DbError> {
         let mut stmt = self.conn.prepare(
             "SELECT t.id, t.name, COUNT(ft.file_hash) as cnt

@@ -106,6 +106,12 @@ pub fn delete_tag_global(state: State<'_, AppState>, tag_name: String) -> Result
 }
 
 #[tauri::command]
+pub fn batch_delete_tags(state: State<'_, AppState>, tag_names: Vec<String>) -> Result<usize, String> {
+    let db = state.db.lock();
+    db.batch_delete_tags(&tag_names).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
 pub fn reconcile_files(state: State<'_, AppState>) -> Result<usize, String> {
     let db = state.db.lock();
     db.reconcile().map_err(|e| e.to_string())

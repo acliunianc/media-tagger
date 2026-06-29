@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Search,
   FolderSearch,
@@ -55,6 +55,16 @@ export default function App() {
   const lastSelectedRef = useRef<string | null>(null);
 
   const activeFile = files.find((f) => f.hash === activeHash) ?? null;
+
+  const selectedFileTags = useMemo(() => {
+    const tagSet = new Set<string>();
+    for (const file of files) {
+      if (selectedHashes.has(file.hash)) {
+        file.tags.forEach((tag) => tagSet.add(tag));
+      }
+    }
+    return Array.from(tagSet).sort((a, b) => a.localeCompare(b, "zh-CN"));
+  }, [files, selectedHashes]);
 
   const loadFiles = useCallback(async () => {
     const fileTypes =
@@ -332,8 +342,8 @@ export default function App() {
       )}
 
       {/* Main content */}
-      <div className="flex flex-1 overflow-hidden" onContextMenu={handleContextMenu}>
-        <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-1 min-h-0 overflow-hidden" onContextMenu={handleContextMenu}>
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 text-xs text-slate-500 border-b border-slate-800">
             <span>
               {files.length} 个文件
@@ -377,6 +387,7 @@ export default function App() {
             onSelect={handleSelect}
             onDoubleClick={setActiveHash}
             filtered={listFiltersActive || searchQuery.trim().length > 0}
+            layoutKey={showListFilters ? "open" : "closed"}
           />
         </div>
         <DetailPanel
@@ -416,17 +427,21 @@ export default function App() {
                 添加
               </button>
             </div>
-            {tags.length > 0 && (
+            {selectedFileTags.length > 0 ? (
               <div className="border-t border-slate-700 mt-1 pt-1 max-h-40 overflow-y-auto">
-                {tags.map((t) => (
+                {selectedFileTags.map((name) => (
                   <button
-                    key={t.id}
-                    onClick={() => handleBatchRemoveTag(t.name)}
+                    key={name}
+                    onClick={() => handleBatchRemoveTag(name)}
                     className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-700 transition-colors"
                   >
-                    移除「{t.name}」
+                    移除「{name}」
                   </button>
                 ))}
+              </div>
+            ) : (
+              <div className="border-t border-slate-700 mt-1 px-3 py-2 text-xs text-slate-500">
+                选中文件暂无标签可移除
               </div>
             )}
           </div>

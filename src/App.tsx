@@ -265,7 +265,7 @@ export default function App() {
         <button
           onClick={() => setShowScanDialog(true)}
           disabled={scanning}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent hover:bg-accent-hover text-sm transition-colors disabled:opacity-50"
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent hover:bg-accent-hover text-sm text-white transition-colors disabled:opacity-50"
         >
           <FolderSearch className="w-4 h-4" />
           扫描

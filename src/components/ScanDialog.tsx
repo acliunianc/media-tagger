@@ -129,7 +129,7 @@ export default function ScanDialog({ open: isOpen, onClose, onScan, scanning }: 
           <button
             onClick={handleStart}
             disabled={paths.length === 0 || scanning}
-            className="px-4 py-2 rounded-lg text-sm bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-lg text-sm text-white bg-accent hover:bg-accent-hover disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {scanning ? "扫描中..." : "开始扫描"}
           </button>

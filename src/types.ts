@@ -49,11 +49,13 @@ export type ImportMode = "merge" | "replace";
 export interface ExportSummary {
   entry_count: number;
   tag_count: number;
+  empty_tag_count: number;
   path: string;
 }
 
 export interface ImportResult {
   imported_entries: number;
   imported_tags: number;
+  imported_empty_tags: number;
   mode: string;
 }

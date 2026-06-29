@@ -1,5 +1,13 @@
 use serde::{Deserialize, Serialize};
 
+fn default_version() -> u32 {
+    1
+}
+
+fn default_app_name() -> String {
+    "MediaTagger".into()
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MediaFile {
     pub hash: String,
@@ -53,6 +61,7 @@ pub struct BatchTagOp {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExportEntry {
     pub hash: String,
+    #[serde(default)]
     pub tags: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub filename: Option<String>,
@@ -62,16 +71,24 @@ pub struct ExportEntry {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExportData {
+    #[serde(default = "default_version")]
     pub version: u32,
+    #[serde(default)]
     pub exported_at: String,
+    #[serde(default = "default_app_name")]
     pub app: String,
+    #[serde(default)]
     pub entries: Vec<ExportEntry>,
+    /// 没有任何文件关联的全局标签
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub empty_tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ExportSummary {
     pub entry_count: usize,
     pub tag_count: usize,
+    pub empty_tag_count: usize,
     pub path: String,
 }
 
@@ -79,5 +96,6 @@ pub struct ExportSummary {
 pub struct ImportResult {
     pub imported_entries: usize,
     pub imported_tags: usize,
+    pub imported_empty_tags: usize,
     pub mode: String,
 }

@@ -511,12 +511,37 @@ impl Database {
                 .push(tag);
         }
 
+        let empty_tags = self.list_empty_tags()?;
+
         Ok(ExportData {
             version: 1,
             exported_at: Utc::now().to_rfc3339(),
             app: "MediaTagger".into(),
             entries: map.into_values().collect(),
+            empty_tags,
         })
+    }
+
+    fn list_empty_tags(&self) -> Result<Vec<String>, DbError> {
+        let mut stmt = self.conn.prepare(
+            "SELECT t.name FROM tags t
+             LEFT JOIN file_tags ft ON t.id = ft.tag_id
+             GROUP BY t.id
+             HAVING COUNT(ft.file_hash) = 0
+             ORDER BY t.name",
+        )?;
+        let tags = stmt
+            .query_map([], |row| row.get(0))?
+            .collect::<Result<Vec<String>, _>>()?;
+        Ok(tags)
+    }
+
+    fn ensure_tag(&self, tag_name: &str) -> Result<(), DbError> {
+        self.conn.execute(
+            "INSERT OR IGNORE INTO tags (name) VALUES (?1)",
+            params![tag_name],
+        )?;
+        Ok(())
     }
 
     fn ensure_file_placeholder(
@@ -554,6 +579,16 @@ impl Database {
 
         let mut imported_entries = 0usize;
         let mut imported_tags = 0usize;
+        let mut imported_empty_tags = 0usize;
+
+        for tag in &data.empty_tags {
+            let tag = tag.trim();
+            if tag.is_empty() {
+                continue;
+            }
+            self.ensure_tag(tag)?;
+            imported_empty_tags += 1;
+        }
 
         for entry in &data.entries {
             if entry.hash.is_empty() || entry.tags.is_empty() {
@@ -572,6 +607,7 @@ impl Database {
                 .unwrap_or("other");
 
             self.ensure_file_placeholder(&entry.hash, filename, file_type)?;
+            imported_entries += 1;
 
             for tag in &entry.tags {
                 let tag = tag.trim();
@@ -581,12 +617,12 @@ impl Database {
                 self.add_tag(&entry.hash, tag)?;
                 imported_tags += 1;
             }
-            imported_entries += 1;
         }
 
         Ok(ImportResult {
             imported_entries,
             imported_tags,
+            imported_empty_tags,
             mode: if replace {
                 "replace".into()
             } else {

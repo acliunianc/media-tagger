@@ -10,6 +10,44 @@ interface ImportExportDialogProps {
   onCompleted: (message: string) => void;
 }
 
+function formatExportMessage(result: {
+  entry_count: number;
+  tag_count: number;
+  empty_tag_count: number;
+}) {
+  if (result.tag_count === 0) {
+    return "导出成功：暂无标签数据";
+  }
+  if (result.entry_count === 0) {
+    return `导出成功：${result.tag_count} 个标签（均为空标签）`;
+  }
+  const emptyPart =
+    result.empty_tag_count > 0 ? `，含 ${result.empty_tag_count} 个空标签` : "";
+  return `导出成功：${result.entry_count} 个文件，${result.tag_count} 个标签${emptyPart}`;
+}
+
+function formatImportMessage(
+  modeLabel: string,
+  result: {
+    imported_entries: number;
+    imported_tags: number;
+    imported_empty_tags: number;
+  }
+) {
+  const totalTags = result.imported_tags + result.imported_empty_tags;
+  if (totalTags === 0 && result.imported_entries === 0) {
+    return `${modeLabel}导入成功：暂无数据`;
+  }
+  if (result.imported_entries === 0) {
+    return `${modeLabel}导入成功：${totalTags} 个标签（${result.imported_empty_tags} 个空标签）`;
+  }
+  const emptyPart =
+    result.imported_empty_tags > 0
+      ? `，${result.imported_empty_tags} 个空标签`
+      : "";
+  return `${modeLabel}导入成功：${result.imported_entries} 个文件，${result.imported_tags} 条标签关联${emptyPart}`;
+}
+
 export default function ImportExportDialog({
   open: isOpen,
   onClose,
@@ -29,9 +67,7 @@ export default function ImportExportDialog({
     setBusy(true);
     try {
       const result = await exportTags(path);
-      onCompleted(
-        `导出成功：${result.entry_count} 个文件，${result.tag_count} 条标签关联`
-      );
+      onCompleted(formatExportMessage(result));
       onClose();
     } catch (e) {
       onCompleted(`导出失败：${e}`);
@@ -61,9 +97,7 @@ export default function ImportExportDialog({
     setBusy(true);
     try {
       const result = await importTags(path, importMode);
-      onCompleted(
-        `${modeLabel}导入成功：${result.imported_entries} 个文件，${result.imported_tags} 条标签关联`
-      );
+      onCompleted(formatImportMessage(modeLabel, result));
       onClose();
     } catch (e) {
       onCompleted(`导入失败：${e}`);
@@ -88,7 +122,7 @@ export default function ImportExportDialog({
           <section>
             <h3 className="text-sm font-medium text-slate-300 mb-2">导出</h3>
             <p className="text-xs text-slate-500 mb-3">
-              将标签数据（按内容哈希）导出为 JSON 文件，可在其他设备或备份中恢复。
+              仅导出有标签的文件及全部标签定义（含无文件关联的空标签）。
             </p>
             <button
               onClick={handleExport}
@@ -105,7 +139,7 @@ export default function ImportExportDialog({
           <section>
             <h3 className="text-sm font-medium text-slate-300 mb-2">导入</h3>
             <p className="text-xs text-slate-500 mb-3">
-              从 JSON 文件导入标签。标签通过内容哈希匹配，与文件路径无关。
+              从 JSON 导入标签与文件关联；空标签也会一并恢复。标签通过内容哈希匹配。
             </p>
 
             <div className="space-y-2 mb-4">

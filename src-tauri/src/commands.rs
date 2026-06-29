@@ -157,13 +157,21 @@ pub async fn start_scan(
 pub fn export_tags(state: State<'_, AppState>, path: String) -> Result<ExportSummary, String> {
     let db = state.db.lock();
     let data = db.export_tag_data().map_err(|e| e.to_string())?;
-    let tag_count: usize = data.entries.iter().map(|e| e.tags.len()).sum();
     let entry_count = data.entries.len();
+    let empty_tag_count = data.empty_tags.len();
+    let mut unique_tags: std::collections::BTreeSet<String> = data
+        .entries
+        .iter()
+        .flat_map(|e| e.tags.iter().cloned())
+        .collect();
+    unique_tags.extend(data.empty_tags.iter().cloned());
+    let tag_count = unique_tags.len();
     let json = serde_json::to_string_pretty(&data).map_err(|e| e.to_string())?;
     std::fs::write(&path, json).map_err(|e| e.to_string())?;
     Ok(ExportSummary {
         entry_count,
         tag_count,
+        empty_tag_count,
         path,
     })
 }
@@ -175,7 +183,11 @@ pub fn import_tags(
     mode: String,
 ) -> Result<ImportResult, String> {
     let content = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
-    let data: ExportData = serde_json::from_str(&content).map_err(|e| e.to_string())?;
+    let content = content.trim();
+    if content.is_empty() {
+        return Err("导入文件为空".into());
+    }
+    let data: ExportData = serde_json::from_str(content).map_err(|e| e.to_string())?;
     let replace = mode == "replace";
     let db = state.db.lock();
     db.import_tag_data(&data, replace).map_err(|e| e.to_string())

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { ImageOff } from "lucide-react";
+import { Eye, ImageOff, Maximize2 } from "lucide-react";
 import type { MediaFile } from "../types";
 import { toAssetUrl } from "../api";
+import MediaFullscreenViewer from "./MediaFullscreenViewer";
 
 interface MediaPreviewProps {
   file: MediaFile;
@@ -9,6 +10,7 @@ interface MediaPreviewProps {
 
 export default function MediaPreview({ file }: MediaPreviewProps) {
   const [failed, setFailed] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
 
   if (file.status === 0) {
     return (
@@ -30,27 +32,61 @@ export default function MediaPreview({ file }: MediaPreviewProps) {
     }
 
     return (
-      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-surface-sunken/80 border border-border-strong/50">
-        <img
-          src={toAssetUrl(file.path)}
-          alt={file.filename}
-          className="w-full max-h-56 object-contain"
-          onError={() => setFailed(true)}
+      <>
+        <button
+          type="button"
+          onClick={() => setFullscreen(true)}
+          className="mx-4 mt-4 block w-[calc(100%-2rem)] rounded-lg overflow-hidden border border-border-strong/50 cursor-pointer group text-left"
+          title="点击预览"
+        >
+          <div className="relative flex items-center justify-center min-h-[140px] bg-surface-sunken/80">
+            <img
+              src={toAssetUrl(file.path)}
+              alt={file.filename}
+              className="max-w-full max-h-56 object-contain pointer-events-none"
+              onError={() => setFailed(true)}
+              draggable={false}
+            />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/45 transition-colors duration-200">
+              <Eye className="w-7 h-7 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+            </div>
+          </div>
+        </button>
+        <MediaFullscreenViewer
+          file={file}
+          open={fullscreen}
+          onClose={() => setFullscreen(false)}
         />
-      </div>
+      </>
     );
   }
 
   if (file.file_type === "video") {
     return (
-      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-video border border-border-strong/50">
-        <video
-          src={toAssetUrl(file.path)}
-          controls
-          preload="metadata"
-          className="w-full max-h-56"
+      <>
+        <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-video border border-border-strong/50 relative">
+          <video
+            src={toAssetUrl(file.path)}
+            controls
+            preload="metadata"
+            className="w-full max-h-56"
+          />
+          <button
+            type="button"
+            onClick={() => setFullscreen(true)}
+            className="absolute top-2 right-2 flex items-center gap-1 px-2 py-1 rounded-md bg-elevated/90 text-xs text-fg hover:bg-hover transition-colors shadow-sm"
+            title="全屏播放"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            全屏
+          </button>
+        </div>
+        <MediaFullscreenViewer
+          file={file}
+          open={fullscreen}
+          onClose={() => setFullscreen(false)}
         />
-      </div>
+      </>
     );
   }
 

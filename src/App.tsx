@@ -7,10 +7,12 @@ import {
   Pause,
   Play,
   XCircle,
-  Filter,
   ArrowDownUp,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import FileList from "./components/FileList";
+import FileListFilter, { hasActiveFileFilters } from "./components/FileListFilter";
 import DetailPanel from "./components/DetailPanel";
 import ScanDialog from "./components/ScanDialog";
 import TagManager from "./components/TagManager";
@@ -27,7 +29,7 @@ import {
   batchAddTags,
   batchRemoveTags,
 } from "./api";
-import type { MediaFile, ScanProgress, TagInfo, FileTypeFilter, StatusFilter } from "./types";
+import type { MediaFile, ScanProgress, TagInfo, FileTypeFilter, StatusFilter, TagPresenceFilter } from "./types";
 
 export default function App() {
   const [files, setFiles] = useState<MediaFile[]>([]);
@@ -39,6 +41,8 @@ export default function App() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [fileTypeFilter, setFileTypeFilter] = useState<FileTypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [tagPresenceFilter, setTagPresenceFilter] = useState<TagPresenceFilter>("all");
+  const [showListFilters, setShowListFilters] = useState(true);
   const [showScanDialog, setShowScanDialog] = useState(false);
   const [showTagManager, setShowTagManager] = useState(false);
   const [showImportExport, setShowImportExport] = useState(false);
@@ -46,7 +50,6 @@ export default function App() {
   const [scanning, setScanning] = useState(false);
   const [scanPaused, setScanPaused] = useState(false);
   const [scanProgress, setScanProgress] = useState<ScanProgress | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [batchTagInput, setBatchTagInput] = useState("");
   const lastSelectedRef = useRef<string | null>(null);
@@ -58,6 +61,10 @@ export default function App() {
       fileTypeFilter === "all" ? [] : [fileTypeFilter];
     const status =
       statusFilter === "all" ? undefined : statusFilter === "active" ? 1 : 0;
+    const hasTags =
+      tagPresenceFilter === "all"
+        ? undefined
+        : tagPresenceFilter === "tagged";
 
     const results = await searchFiles({
       query: searchQuery,
@@ -65,9 +72,10 @@ export default function App() {
       tags: selectedTags,
       file_types: fileTypes,
       status,
+      has_tags: hasTags,
     });
     setFiles(results);
-  }, [searchQuery, tagLogic, selectedTags, fileTypeFilter, statusFilter]);
+  }, [searchQuery, tagLogic, selectedTags, fileTypeFilter, statusFilter, tagPresenceFilter]);
 
   const loadTags = useCallback(async () => {
     const t = await listTags();
@@ -187,6 +195,20 @@ export default function App() {
     );
   };
 
+  const clearListFilters = () => {
+    setFileTypeFilter("all");
+    setStatusFilter("all");
+    setTagPresenceFilter("all");
+    setSelectedTags([]);
+  };
+
+  const listFiltersActive = hasActiveFileFilters(
+    fileTypeFilter,
+    statusFilter,
+    tagPresenceFilter,
+    selectedTags
+  );
+
   return (
     <div className="h-screen flex flex-col bg-[#0f0f1a]">
       {/* Header */}
@@ -214,14 +236,6 @@ export default function App() {
             <option value="OR">OR</option>
           </select>
         </div>
-
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className={`p-2 rounded-lg transition-colors ${showFilters ? "bg-accent/20 text-accent" : "hover:bg-slate-800"}`}
-          title="筛选"
-        >
-          <Filter className="w-5 h-5" />
-        </button>
 
         <button
           onClick={() => setShowScanDialog(true)}
@@ -256,54 +270,6 @@ export default function App() {
           <ArrowDownUp className="w-5 h-5" />
         </button>
       </header>
-
-      {/* Filters bar */}
-      {showFilters && (
-        <div className="flex items-center gap-4 px-4 py-2 border-b border-slate-800 bg-slate-900/50 text-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-slate-500">类型:</span>
-            {(["all", "image", "video", "audio", "other"] as FileTypeFilter[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setFileTypeFilter(t)}
-                className={`px-2 py-1 rounded ${fileTypeFilter === t ? "bg-accent/20 text-accent" : "hover:bg-slate-800"}`}
-              >
-                {t === "all" ? "全部" : t}
-              </button>
-            ))}
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-slate-500">状态:</span>
-            {(["all", "active", "lost"] as StatusFilter[]).map((s) => (
-              <button
-                key={s}
-                onClick={() => setStatusFilter(s)}
-                className={`px-2 py-1 rounded ${statusFilter === s ? "bg-accent/20 text-accent" : "hover:bg-slate-800"}`}
-              >
-                {s === "all" ? "全部" : s === "active" ? "正常" : "丢失"}
-              </button>
-            ))}
-          </div>
-          {tags.length > 0 && (
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-slate-500">标签:</span>
-              {tags.slice(0, 10).map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => toggleTagFilter(t.name)}
-                  className={`px-2 py-0.5 rounded-full text-xs ${
-                    selectedTags.includes(t.name)
-                      ? "bg-accent/30 text-accent"
-                      : "bg-slate-800 hover:bg-slate-700"
-                  }`}
-                >
-                  {t.name}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Scan progress */}
       {scanning && scanProgress && (
@@ -372,14 +338,45 @@ export default function App() {
             <span>
               {files.length} 个文件
               {selectedHashes.size > 0 && ` · 已选 ${selectedHashes.size}`}
+              {listFiltersActive && " · 已筛选"}
             </span>
+            <button
+              onClick={() => setShowListFilters(!showListFilters)}
+              className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
+                showListFilters || listFiltersActive
+                  ? "text-accent bg-accent/10"
+                  : "hover:bg-slate-800 text-slate-400"
+              }`}
+            >
+              筛选
+              {showListFilters ? (
+                <ChevronUp className="w-3.5 h-3.5" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5" />
+              )}
+            </button>
           </div>
+          {showListFilters && (
+            <FileListFilter
+              tags={tags}
+              fileTypeFilter={fileTypeFilter}
+              statusFilter={statusFilter}
+              tagPresenceFilter={tagPresenceFilter}
+              selectedTags={selectedTags}
+              onFileTypeChange={setFileTypeFilter}
+              onStatusChange={setStatusFilter}
+              onTagPresenceChange={setTagPresenceFilter}
+              onToggleTag={toggleTagFilter}
+              onClearFilters={clearListFilters}
+            />
+          )}
           <FileList
             files={files}
             selectedHashes={selectedHashes}
             activeHash={activeHash}
             onSelect={handleSelect}
             onDoubleClick={setActiveHash}
+            filtered={listFiltersActive || searchQuery.trim().length > 0}
           />
         </div>
         <DetailPanel

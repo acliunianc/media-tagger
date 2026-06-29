@@ -50,6 +50,7 @@ pub struct SearchQuery {
     pub min_size: Option<i64>,
     pub max_size: Option<i64>,
     pub status: Option<i32>,
+    pub has_tags: Option<bool>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

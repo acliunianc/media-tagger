@@ -11,6 +11,7 @@ interface FileListProps {
   activeHash: string | null;
   onSelect: (hash: string, ctrl: boolean, shift: boolean) => void;
   onDoubleClick: (hash: string) => void;
+  filtered?: boolean;
 }
 
 const ROW_HEIGHT = 56;
@@ -21,6 +22,7 @@ export default function FileList({
   activeHash,
   onSelect,
   onDoubleClick,
+  filtered = false,
 }: FileListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(600);
@@ -88,8 +90,10 @@ export default function FileList({
       <div className="flex-1 flex items-center justify-center text-slate-500">
         <div className="text-center">
           <File className="w-12 h-12 mx-auto mb-3 opacity-30" />
-          <p>暂无文件</p>
-          <p className="text-sm mt-1">点击「扫描文件夹」开始</p>
+          <p>{filtered ? "没有匹配的文件" : "暂无文件"}</p>
+          <p className="text-sm mt-1">
+            {filtered ? "尝试调整筛选条件" : "点击「扫描文件夹」开始"}
+          </p>
         </div>
       </div>
     );

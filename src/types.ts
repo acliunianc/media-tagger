@@ -35,6 +35,7 @@ export interface SearchQuery {
   min_size?: number;
   max_size?: number;
   status?: number;
+  has_tags?: boolean;
 }
 
 export interface BatchTagOp {
@@ -44,6 +45,7 @@ export interface BatchTagOp {
 
 export type FileTypeFilter = "all" | "image" | "video" | "audio" | "other";
 export type StatusFilter = "all" | "active" | "lost";
+export type TagPresenceFilter = "all" | "tagged" | "untagged";
 export type ImportMode = "merge" | "replace";
 
 export interface ExportSummary {

@@ -217,6 +217,18 @@ impl Database {
             bind_values.push(Box::new(max));
         }
 
+        if let Some(has_tags) = query.has_tags {
+            if has_tags {
+                conditions.push(
+                    "f.hash IN (SELECT DISTINCT file_hash FROM file_tags)".into(),
+                );
+            } else {
+                conditions.push(
+                    "f.hash NOT IN (SELECT DISTINCT file_hash FROM file_tags)".into(),
+                );
+            }
+        }
+
         let tag_filter = if !query.tags.is_empty() {
             let logic = if query.logic.to_uppercase() == "OR" {
                 "OR"

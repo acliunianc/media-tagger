@@ -12,7 +12,7 @@ export default function MediaPreview({ file }: MediaPreviewProps) {
 
   if (file.status === 0) {
     return (
-      <div className="mx-4 mt-4 p-6 rounded-lg bg-slate-800/40 border border-slate-700 flex flex-col items-center gap-2 text-slate-500">
+      <div className="mx-4 mt-4 p-6 rounded-lg bg-hover/40 border border-border-strong flex flex-col items-center gap-2 text-fg-muted">
         <ImageOff className="w-8 h-8" />
         <span className="text-xs">文件已丢失，无法预览</span>
       </div>
@@ -22,7 +22,7 @@ export default function MediaPreview({ file }: MediaPreviewProps) {
   if (file.file_type === "image") {
     if (failed) {
       return (
-        <div className="mx-4 mt-4 p-6 rounded-lg bg-slate-800/40 border border-slate-700 flex flex-col items-center gap-2 text-slate-500">
+        <div className="mx-4 mt-4 p-6 rounded-lg bg-hover/40 border border-border-strong flex flex-col items-center gap-2 text-fg-muted">
           <ImageOff className="w-8 h-8" />
           <span className="text-xs">无法加载图片预览</span>
         </div>
@@ -30,7 +30,7 @@ export default function MediaPreview({ file }: MediaPreviewProps) {
     }
 
     return (
-      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-slate-900/80 border border-slate-700/50">
+      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-surface-sunken/80 border border-border-strong/50">
         <img
           src={toAssetUrl(file.path)}
           alt={file.filename}
@@ -43,7 +43,7 @@ export default function MediaPreview({ file }: MediaPreviewProps) {
 
   if (file.file_type === "video") {
     return (
-      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-black border border-slate-700/50">
+      <div className="mx-4 mt-4 rounded-lg overflow-hidden bg-video border border-border-strong/50">
         <video
           src={toAssetUrl(file.path)}
           controls

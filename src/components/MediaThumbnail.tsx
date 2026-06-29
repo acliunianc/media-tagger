@@ -19,13 +19,13 @@ function FileIcon({ type, className }: { type: string; className?: string }) {
   const cls = className ?? "w-4 h-4 shrink-0";
   switch (type) {
     case "image":
-      return <FileImage className={`${cls} text-emerald-400`} />;
+      return <FileImage className={`${cls} text-file-image`} />;
     case "video":
-      return <FileVideo className={`${cls} text-blue-400`} />;
+      return <FileVideo className={`${cls} text-info`} />;
     case "audio":
-      return <FileAudio className={`${cls} text-purple-400`} />;
+      return <FileAudio className={`${cls} text-file-audio`} />;
     default:
-      return <File className={`${cls} text-slate-400`} />;
+      return <File className={`${cls} text-fg-subtle`} />;
   }
 }
 
@@ -36,7 +36,7 @@ export default function MediaThumbnail({ file, size = "sm", className = "" }: Me
   if (file.status === 0 || failed || file.file_type !== "image") {
     return (
       <div
-        className={`${sizeClass} rounded bg-slate-800/80 shrink-0 flex items-center justify-center ${className}`}
+        className={`${sizeClass} rounded bg-elevated/80 shrink-0 flex items-center justify-center ${className}`}
       >
         <FileIcon type={file.file_type} className={size === "sm" ? "w-4 h-4" : "w-6 h-6"} />
       </div>
@@ -45,7 +45,7 @@ export default function MediaThumbnail({ file, size = "sm", className = "" }: Me
 
   return (
     <div
-      className={`${sizeClass} rounded overflow-hidden bg-slate-800 shrink-0 flex items-center justify-center ${className}`}
+      className={`${sizeClass} rounded overflow-hidden bg-elevated shrink-0 flex items-center justify-center ${className}`}
     >
       <img
         src={toAssetUrl(file.path)}

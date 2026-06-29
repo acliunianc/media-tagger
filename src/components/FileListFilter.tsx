@@ -55,7 +55,7 @@ function FilterGroup<T extends string>({
 }) {
   return (
     <div className="flex items-center gap-1.5 flex-wrap">
-      <span className="text-xs text-slate-500 shrink-0">{label}</span>
+      <span className="text-xs text-fg-muted shrink-0">{label}</span>
       {options.map((opt) => (
         <button
           key={opt}
@@ -63,7 +63,7 @@ function FilterGroup<T extends string>({
           className={`px-2 py-0.5 rounded text-xs transition-colors ${
             value === opt
               ? "bg-accent/25 text-accent"
-              : "bg-slate-800/60 text-slate-400 hover:bg-slate-700"
+              : "bg-input/60 text-fg-subtle hover:bg-hover-strong"
           }`}
         >
           {labels[opt]}
@@ -100,16 +100,16 @@ export default function FileListFilter({
     selectedTags.length > 0;
 
   return (
-    <div className="border-b border-slate-800 bg-slate-900/40 px-3 py-2 space-y-2">
+    <div className="border-b border-border bg-surface-sunken/40 px-3 py-2 space-y-2">
       <div className="flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-xs text-slate-400">
+        <div className="flex items-center gap-1.5 text-xs text-fg-subtle">
           <Filter className="w-3.5 h-3.5" />
           筛选
         </div>
         {hasActiveFilters && (
           <button
             onClick={onClearFilters}
-            className="flex items-center gap-1 text-xs text-slate-500 hover:text-accent transition-colors"
+            className="flex items-center gap-1 text-xs text-fg-muted hover:text-accent transition-colors"
           >
             <X className="w-3 h-3" />
             清除筛选
@@ -144,18 +144,18 @@ export default function FileListFilter({
       {tags.length > 0 && (
         <div className="space-y-1.5">
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-500" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-fg-muted" />
             <input
               type="text"
               value={tagSearch}
               onChange={(e) => setTagSearch(e.target.value)}
               placeholder="按标签筛选..."
-              className="w-full pl-7 pr-3 py-1.5 rounded-md bg-slate-800/60 border border-slate-700/80 text-xs focus:outline-none focus:border-accent/50"
+              className="w-full pl-7 pr-3 py-1.5 rounded-md bg-input/60 border border-border-strong/80 text-xs focus:outline-none focus:border-accent/50"
             />
           </div>
           <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
             {filteredTags.length === 0 ? (
-              <span className="text-xs text-slate-500 py-1">未找到匹配标签</span>
+              <span className="text-xs text-fg-muted py-1">未找到匹配标签</span>
             ) : (
               filteredTags.map((t) => (
                 <button
@@ -164,7 +164,7 @@ export default function FileListFilter({
                   className={`px-2 py-0.5 rounded-full text-xs transition-colors ${
                     selectedTags.includes(t.name)
                       ? "bg-accent/30 text-accent ring-1 ring-accent/40"
-                      : "bg-slate-800 text-slate-400 hover:bg-slate-700"
+                      : "bg-elevated text-fg-subtle hover:bg-hover-strong"
                   }`}
                   title={`${t.count} 个文件`}
                 >
@@ -174,7 +174,7 @@ export default function FileListFilter({
             )}
           </div>
           {selectedTags.length > 0 && (
-            <div className="text-xs text-slate-500">
+            <div className="text-xs text-fg-muted">
               已选 {selectedTags.length} 个标签
             </div>
           )}

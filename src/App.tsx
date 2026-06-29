@@ -235,26 +235,26 @@ export default function App() {
   );
 
   return (
-    <div className="h-screen flex flex-col bg-[#0f0f1a]">
+    <div className="h-screen flex flex-col bg-page">
       {/* Header */}
-      <header className="flex items-center gap-3 px-4 py-3 border-b border-slate-800 bg-surface/80 backdrop-blur">
+      <header className="flex items-center gap-3 px-4 py-3 border-b border-border bg-surface/80 backdrop-blur">
         <h1 className="text-lg font-bold text-accent mr-2">MediaTagger</h1>
 
         <div className="flex-1 flex items-center gap-2 max-w-xl">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜索文件名、路径或标签..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-800/60 border border-slate-700 text-sm focus:outline-none focus:border-accent/50"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-input/60 border border-border-strong text-sm focus:outline-none focus:border-accent/50"
             />
           </div>
           <select
             value={tagLogic}
             onChange={(e) => setTagLogic(e.target.value as "AND" | "OR")}
-            className="px-2 py-2 rounded-lg bg-slate-800/60 border border-slate-700 text-sm focus:outline-none"
+            className="px-2 py-2 rounded-lg bg-input/60 border border-border-strong text-sm focus:outline-none"
             title="标签搜索逻辑"
           >
             <option value="AND">AND</option>
@@ -273,7 +273,7 @@ export default function App() {
 
         <button
           onClick={handleReconcile}
-          className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-lg hover:bg-hover transition-colors"
           title="同步文件状态"
         >
           <RefreshCw className="w-5 h-5" />
@@ -281,7 +281,7 @@ export default function App() {
 
         <button
           onClick={() => setShowTagManager(true)}
-          className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-lg hover:bg-hover transition-colors"
           title="标签管理"
         >
           <Tag className="w-5 h-5" />
@@ -289,7 +289,7 @@ export default function App() {
 
         <button
           onClick={() => setShowImportExport(true)}
-          className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+          className="p-2 rounded-lg hover:bg-hover transition-colors"
           title="导入 / 导出"
         >
           <ArrowDownUp className="w-5 h-5" />
@@ -298,7 +298,7 @@ export default function App() {
 
       {/* Scan progress */}
       {scanning && scanProgress && (
-        <div className="flex items-center gap-4 px-4 py-2 bg-surface-light border-b border-slate-800 text-sm">
+        <div className="flex items-center gap-4 px-4 py-2 bg-surface-light border-b border-border text-sm">
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1">
               <span>
@@ -306,11 +306,11 @@ export default function App() {
                   ? "已暂停"
                   : `扫描中 ${scanProgress.scanned}/${scanProgress.total}`}
               </span>
-              <span className="text-slate-500 truncate max-w-md">
+              <span className="text-fg-muted truncate max-w-md">
                 {scanProgress.current_path}
               </span>
             </div>
-            <div className="h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div className="h-1.5 bg-elevated rounded-full overflow-hidden">
               <div
                 className="h-full bg-accent transition-all duration-300"
                 style={{
@@ -329,7 +329,7 @@ export default function App() {
                 resumeScan();
                 setScanPaused(false);
               }}
-              className="p-1.5 rounded hover:bg-slate-800"
+              className="p-1.5 rounded hover:bg-hover"
             >
               <Play className="w-4 h-4" />
             </button>
@@ -339,7 +339,7 @@ export default function App() {
                 pauseScan();
                 setScanPaused(true);
               }}
-              className="p-1.5 rounded hover:bg-slate-800"
+              className="p-1.5 rounded hover:bg-hover"
             >
               <Pause className="w-4 h-4" />
             </button>
@@ -349,7 +349,7 @@ export default function App() {
               cancelScan();
               setScanning(false);
             }}
-            className="p-1.5 rounded hover:bg-slate-800 text-red-400"
+            className="p-1.5 rounded hover:bg-hover text-danger"
           >
             <XCircle className="w-4 h-4" />
           </button>
@@ -365,13 +365,13 @@ export default function App() {
           onSelectFolder={setSelectedFolder}
         />
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-2 text-xs text-slate-500 border-b border-slate-800">
+          <div className="flex items-center justify-between px-4 py-2 text-xs text-fg-muted border-b border-border">
             <span className="truncate min-w-0">
               {files.length} 个文件
               {selectedHashes.size > 0 && ` · 已选 ${selectedHashes.size}`}
               {listFiltersActive && " · 已筛选"}
               {selectedFolder && (
-                <span className="text-slate-400">
+                <span className="text-fg-subtle">
                   {" "}
                   ·{" "}
                   <span title={selectedFolder}>
@@ -385,7 +385,7 @@ export default function App() {
               className={`flex items-center gap-1 px-2 py-1 rounded transition-colors ${
                 showListFilters || listFiltersActive
                   ? "text-accent bg-accent/10"
-                  : "hover:bg-slate-800 text-slate-400"
+                  : "hover:bg-hover text-fg-subtle"
               }`}
             >
               筛选
@@ -434,10 +434,10 @@ export default function App() {
         <>
           <div className="fixed inset-0 z-40" onClick={() => setContextMenu(null)} />
           <div
-            className="fixed z-50 bg-slate-800 border border-slate-700 rounded-lg shadow-xl py-2 min-w-[200px]"
+            className="fixed z-50 bg-elevated border border-border-strong rounded-lg shadow-xl py-2 min-w-[200px]"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
-            <div className="px-3 py-1 text-xs text-slate-500">
+            <div className="px-3 py-1 text-xs text-fg-muted">
               批量操作 ({selectedHashes.size} 文件)
             </div>
             <div className="px-3 py-2 flex gap-2">
@@ -447,7 +447,7 @@ export default function App() {
                 onChange={(e) => setBatchTagInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleBatchAddTag()}
                 placeholder="添加标签..."
-                className="flex-1 px-2 py-1 rounded bg-slate-900 border border-slate-600 text-sm focus:outline-none"
+                className="flex-1 px-2 py-1 rounded bg-surface-sunken border border-border-input text-sm focus:outline-none"
                 autoFocus
               />
               <button
@@ -458,19 +458,19 @@ export default function App() {
               </button>
             </div>
             {selectedFileTags.length > 0 ? (
-              <div className="border-t border-slate-700 mt-1 pt-1 max-h-40 overflow-y-auto">
+              <div className="border-t border-border-strong mt-1 pt-1 max-h-40 overflow-y-auto">
                 {selectedFileTags.map((name) => (
                   <button
                     key={name}
                     onClick={() => handleBatchRemoveTag(name)}
-                    className="w-full text-left px-3 py-1.5 text-sm hover:bg-slate-700 transition-colors"
+                    className="w-full text-left px-3 py-1.5 text-sm hover:bg-hover-strong transition-colors"
                   >
                     移除「{name}」
                   </button>
                 ))}
               </div>
             ) : (
-              <div className="border-t border-slate-700 mt-1 px-3 py-2 text-xs text-slate-500">
+              <div className="border-t border-border-strong mt-1 px-3 py-2 text-xs text-fg-muted">
                 选中文件暂无标签可移除
               </div>
             )}
@@ -507,7 +507,7 @@ export default function App() {
       />
 
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg bg-slate-800 border border-slate-600 shadow-xl text-sm max-w-md text-center">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-lg bg-elevated border border-border-input shadow-xl text-sm max-w-md text-center">
           {toast}
         </div>
       )}

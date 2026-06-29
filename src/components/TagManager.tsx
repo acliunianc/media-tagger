@@ -110,34 +110,34 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-surface-light rounded-xl shadow-2xl w-[520px] max-h-[75vh] flex flex-col border border-slate-700">
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/60">
+      <div className="bg-surface-light rounded-xl shadow-2xl w-[520px] max-h-[75vh] flex flex-col border border-border-strong">
+        <div className="flex items-center justify-between p-4 border-b border-border-strong">
           <h2 className="text-lg font-semibold flex items-center gap-2">
             <Tag className="w-5 h-5" />
             全局标签管理
-            <span className="text-xs font-normal text-slate-500">({tags.length})</span>
+            <span className="text-xs font-normal text-fg-muted">({tags.length})</span>
           </h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-fg-subtle hover:text-fg">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="px-4 py-3 border-b border-slate-700 space-y-3">
+        <div className="px-4 py-3 border-b border-border-strong space-y-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-fg-muted" />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="搜索标签..."
-              className="w-full pl-10 pr-4 py-2 rounded-lg bg-slate-800/60 border border-slate-700 text-sm focus:outline-none focus:border-accent/50"
+              className="w-full pl-10 pr-4 py-2 rounded-lg bg-input/60 border border-border-strong text-sm focus:outline-none focus:border-accent/50"
             />
           </div>
 
           {tags.length > 0 && (
             <div className="flex items-center justify-between text-sm">
-              <label className="flex items-center gap-2 cursor-pointer text-slate-400">
+              <label className="flex items-center gap-2 cursor-pointer text-fg-subtle">
                 <input
                   type="checkbox"
                   checked={allFilteredSelected}
@@ -151,7 +151,7 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
                 <button
                   onClick={handleBatchDelete}
                   disabled={busy}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 text-xs transition-colors disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-danger/20 text-danger hover:bg-danger/30 text-xs transition-colors disabled:opacity-50"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   删除选中 ({selected.size})
@@ -163,14 +163,14 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
 
         <div className="overflow-y-auto flex-1 p-2">
           {tags.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">暂无标签</p>
+            <p className="text-center text-fg-muted py-8">暂无标签</p>
           ) : filteredTags.length === 0 ? (
-            <p className="text-center text-slate-500 py-8">未找到匹配的标签</p>
+            <p className="text-center text-fg-muted py-8">未找到匹配的标签</p>
           ) : (
             filteredTags.map((tag) => (
               <div
                 key={tag.id}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-800/40 ${
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-hover/40 ${
                   selected.has(tag.id) ? "bg-accent/10" : ""
                 }`}
               >
@@ -192,14 +192,14 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
                       if (e.key === "Escape") setEditingId(null);
                     }}
                     onBlur={() => handleRename(tag.name)}
-                    className="flex-1 px-2 py-1 rounded bg-slate-800 border border-slate-600 text-sm focus:outline-none"
+                    className="flex-1 px-2 py-1 rounded bg-elevated border border-border-input text-sm focus:outline-none"
                   />
                 ) : (
                   <>
                     <span className="flex-1 text-sm truncate" title={tag.name}>
                       {tag.name}
                     </span>
-                    <span className="text-xs text-slate-500 shrink-0">
+                    <span className="text-xs text-fg-muted shrink-0">
                       {tag.count} 文件
                     </span>
                     <button
@@ -209,7 +209,7 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
                       }}
                       disabled={busy}
                       title="重命名"
-                      className="p-1 text-slate-400 hover:text-white transition-colors disabled:opacity-50"
+                      className="p-1 text-fg-subtle hover:text-fg transition-colors disabled:opacity-50"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -217,7 +217,7 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
                       onClick={() => handleDelete(tag.name)}
                       disabled={busy}
                       title="删除"
-                      className="p-1 text-slate-400 hover:text-red-400 transition-colors disabled:opacity-50"
+                      className="p-1 text-fg-subtle hover:text-danger transition-colors disabled:opacity-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -229,7 +229,7 @@ export default function TagManager({ open: isOpen, tags, onClose, onChanged }: T
         </div>
 
         {search.trim() && filteredTags.length > 0 && (
-          <div className="px-4 py-2 border-t border-slate-700 text-xs text-slate-500">
+          <div className="px-4 py-2 border-t border-border-strong text-xs text-fg-muted">
             显示 {filteredTags.length} / {tags.length} 个标签
           </div>
         )}

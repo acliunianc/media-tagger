@@ -109,41 +109,41 @@ export default function ImportExportDialog({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-surface-light rounded-xl shadow-2xl w-[480px] border border-slate-700">
-        <div className="flex items-center justify-between p-4 border-b border-slate-700">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-overlay/60">
+      <div className="bg-surface-light rounded-xl shadow-2xl w-[480px] border border-border-strong">
+        <div className="flex items-center justify-between p-4 border-b border-border-strong">
           <h2 className="text-lg font-semibold">导入 / 导出</h2>
-          <button onClick={onClose} className="text-slate-400 hover:text-white">
+          <button onClick={onClose} className="text-fg-subtle hover:text-fg">
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <div className="p-4 space-y-5">
           <section>
-            <h3 className="text-sm font-medium text-slate-300 mb-2">导出</h3>
-            <p className="text-xs text-slate-500 mb-3">
+            <h3 className="text-sm font-medium text-fg-secondary mb-2">导出</h3>
+            <p className="text-xs text-fg-muted mb-3">
               仅导出有标签的文件及全部标签定义（含无文件关联的空标签）。
             </p>
             <button
               onClick={handleExport}
               disabled={busy}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-elevated hover:bg-hover-strong text-sm transition-colors disabled:opacity-50"
             >
               <Download className="w-4 h-4" />
               导出标签数据
             </button>
           </section>
 
-          <div className="border-t border-slate-700" />
+          <div className="border-t border-border-strong" />
 
           <section>
-            <h3 className="text-sm font-medium text-slate-300 mb-2">导入</h3>
-            <p className="text-xs text-slate-500 mb-3">
+            <h3 className="text-sm font-medium text-fg-secondary mb-2">导入</h3>
+            <p className="text-xs text-fg-muted mb-3">
               从 JSON 导入标签与文件关联；空标签也会一并恢复。标签通过内容哈希匹配。
             </p>
 
             <div className="space-y-2 mb-4">
-              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-800/40">
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-border-strong cursor-pointer hover:bg-hover/40">
                 <input
                   type="radio"
                   name="importMode"
@@ -153,12 +153,12 @@ export default function ImportExportDialog({
                 />
                 <div>
                   <div className="text-sm font-medium">合并</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-fg-muted">
                     保留现有标签，追加导入文件中的新标签（相同哈希去重）
                   </div>
                 </div>
               </label>
-              <label className="flex items-start gap-3 p-3 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-800/40">
+              <label className="flex items-start gap-3 p-3 rounded-lg border border-border-strong cursor-pointer hover:bg-hover/40">
                 <input
                   type="radio"
                   name="importMode"
@@ -168,7 +168,7 @@ export default function ImportExportDialog({
                 />
                 <div>
                   <div className="text-sm font-medium">替换</div>
-                  <div className="text-xs text-slate-500">
+                  <div className="text-xs text-fg-muted">
                     清除所有现有标签，完全使用导入文件中的标签数据
                   </div>
                 </div>

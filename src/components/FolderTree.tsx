@@ -42,7 +42,7 @@ function FolderTreeNode({
         className={`flex items-center gap-1 py-1 pr-2 rounded-md cursor-pointer text-sm transition-colors ${
           isSelected
             ? "bg-accent/20 text-accent"
-            : "text-slate-300 hover:bg-slate-800/60"
+            : "text-fg-secondary hover:bg-input/60"
         }`}
         style={{ paddingLeft: `${8 + depth * 14}px` }}
         onClick={() => onSelectFolder(node.path)}
@@ -50,7 +50,7 @@ function FolderTreeNode({
       >
         <button
           type="button"
-          className="p-0.5 shrink-0 text-slate-500 hover:text-slate-300"
+          className="p-0.5 shrink-0 text-fg-muted hover:text-fg-secondary"
           onClick={(e) => {
             e.stopPropagation();
             if (hasChildren) onToggleExpand(node.path);
@@ -69,10 +69,10 @@ function FolderTreeNode({
         {isSelected ? (
           <FolderOpen className="w-4 h-4 shrink-0 text-accent" />
         ) : (
-          <Folder className="w-4 h-4 shrink-0 text-slate-500" />
+          <Folder className="w-4 h-4 shrink-0 text-fg-muted" />
         )}
         <span className="flex-1 truncate">{node.name}</span>
-        <span className="text-xs text-slate-500 shrink-0">{node.file_count}</span>
+        <span className="text-xs text-fg-muted shrink-0">{node.file_count}</span>
       </div>
       {hasChildren && isExpanded &&
         node.children.map((child) => (
@@ -120,8 +120,8 @@ export default function FolderTree({
   };
 
   return (
-    <div className="w-56 shrink-0 flex flex-col min-h-0 border-r border-slate-800 bg-slate-900/30">
-      <div className="px-3 py-2 text-xs font-medium text-slate-400 border-b border-slate-800">
+    <div className="w-56 shrink-0 flex flex-col min-h-0 border-r border-border bg-surface-sunken/30">
+      <div className="px-3 py-2 text-xs font-medium text-fg-subtle border-b border-border">
         文件夹
       </div>
       <div className="flex-1 min-h-0 overflow-y-auto p-1">
@@ -129,17 +129,17 @@ export default function FolderTree({
           className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer text-sm transition-colors mb-1 ${
             selectedFolder === null
               ? "bg-accent/20 text-accent"
-              : "text-slate-300 hover:bg-slate-800/60"
+              : "text-fg-secondary hover:bg-input/60"
           }`}
           onClick={() => onSelectFolder(null)}
         >
           <HardDrive className="w-4 h-4 shrink-0" />
           <span className="flex-1">全部文件</span>
-          <span className="text-xs text-slate-500">{totalFiles}</span>
+          <span className="text-xs text-fg-muted">{totalFiles}</span>
         </div>
 
         {roots.length === 0 ? (
-          <p className="px-2 py-4 text-xs text-slate-500 text-center">扫描后显示目录</p>
+          <p className="px-2 py-4 text-xs text-fg-muted text-center">扫描后显示目录</p>
         ) : (
           roots.map((root) => (
             <FolderTreeNode

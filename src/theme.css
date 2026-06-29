@@ -1,0 +1,116 @@
+/**
+ * MediaTagger 主题变量
+ *
+ * 所有颜色值为 RGB 分量（无 rgb() 包裹），供 Tailwind 通过
+ * rgb(var(--token) / <alpha-value>) 使用。
+ *
+ * Tailwind 类名对照：
+ *   bg-page              页面背景
+ *   bg-surface           卡片 / 顶栏
+ *   bg-surface-raised    弹窗、进度条区域
+ *   bg-surface-sunken    侧栏、筛选栏底色
+ *   bg-surface-muted     输入框、列表行底色
+ *   bg-elevated          下拉、右键菜单、Toast
+ *   bg-input             表单输入背景
+ *   bg-hover             悬停背景
+ *   bg-hover-strong      深一级悬停
+ *   text-fg              主文字
+ *   text-fg-secondary    次要文字
+ *   text-fg-muted        辅助 / 占位
+ *   text-fg-subtle       图标、标签
+ *   border-border        默认边框
+ *   border-border-strong 强调边框
+ *   border-border-input  输入框边框
+ *   text-accent          强调色
+ *   bg-accent            主按钮
+ *   text-warning         警告（文件丢失）
+ *   text-danger          危险操作
+ *   text-info            视频图标
+ *   text-file-image      图片图标
+ *   text-file-audio      音频图标
+ */
+
+:root,
+[data-theme="light"] {
+  /* 页面 & 表面 */
+  --color-page: 248 250 252;
+  --color-surface: 255 255 255;
+  --color-surface-raised: 248 250 252;
+  --color-surface-sunken: 241 245 249;
+  --color-surface-muted: 241 245 249;
+
+  /* 文字 */
+  --color-fg: 15 23 42;
+  --color-fg-secondary: 51 65 85;
+  --color-fg-muted: 100 116 139;
+  --color-fg-subtle: 148 163 184;
+
+  /* 边框 */
+  --color-border: 226 232 240;
+  --color-border-strong: 203 213 225;
+  --color-border-input: 203 213 225;
+
+  /* 交互 */
+  --color-hover: 241 245 249;
+  --color-hover-strong: 226 232 240;
+  --color-input: 255 255 255;
+  --color-elevated: 255 255 255;
+  --color-overlay: 0 0 0;
+
+  /* 强调色 */
+  --color-accent: 37 99 235;
+  --color-accent-hover: 29 78 216;
+
+  /* 状态色 */
+  --color-warning: 217 119 6;
+  --color-danger: 220 38 38;
+  --color-info: 37 99 235;
+  --color-file-image: 5 150 105;
+  --color-file-audio: 147 51 234;
+
+  /* 滚动条 */
+  --color-scrollbar: 203 213 225;
+  --color-scrollbar-hover: 148 163 184;
+
+  /* 预览 */
+  --color-preview-bg: 241 245 249;
+  --color-video-bg: 15 23 42;
+}
+
+[data-theme="dark"] {
+  --color-page: 15 15 26;
+  --color-surface: 15 15 26;
+  --color-surface-raised: 30 30 46;
+  --color-surface-sunken: 15 23 42;
+  --color-surface-muted: 30 41 59;
+
+  --color-fg: 226 232 240;
+  --color-fg-secondary: 203 213 225;
+  --color-fg-muted: 100 116 139;
+  --color-fg-subtle: 148 163 184;
+
+  --color-border: 30 41 59;
+  --color-border-strong: 51 65 85;
+  --color-border-input: 71 85 105;
+
+  --color-hover: 30 41 59;
+  --color-hover-strong: 51 65 85;
+  --color-input: 30 41 59;
+  --color-elevated: 30 41 59;
+  --color-overlay: 0 0 0;
+
+  --color-accent: 37 99 235;
+  --color-accent-hover: 29 78 216;
+
+  --color-warning: 251 191 36;
+  --color-danger: 248 113 113;
+  --color-info: 96 165 250;
+  --color-file-image: 52 211 153;
+  --color-file-audio: 192 132 252;
+
+  --color-scrollbar: 51 65 85;
+  --color-scrollbar-hover: 71 85 105;
+
+  --color-preview-bg: 15 23 42;
+  --color-video-bg: 0 0 0;
+}

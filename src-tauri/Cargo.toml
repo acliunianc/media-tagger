@@ -1,8 +1,11 @@
 [package]
 name = "media-tagger"
 version = "1.0.0"
-description = "Local media tagging desktop app"
-authors = ["MediaTagger"]
+description = "Local media tagging desktop app with content-hash based labels"
+authors = ["acliunianc"]
+license = "MIT"
+repository = "https://github.com/acliunianc/media-tagger"
+homepage = "https://github.com/acliunianc/media-tagger"
 edition = "2021"
 
 [lib]

@@ -3,12 +3,33 @@
   "private": true,
   "version": "1.0.0",
   "description": "基于 Tauri 的本地媒体标签管理桌面应用，通过内容哈希绑定标签，支持文件夹扫描、多维筛选、批量打标与标签导入导出",
+  "author": "acliunianc",
+  "license": "MIT",
+  "homepage": "https://github.com/acliunianc/media-tagger#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/acliunianc/media-tagger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/acliunianc/media-tagger/issues"
+  },
+  "keywords": [
+    "tauri",
+    "media",
+    "tagging",
+    "desktop",
+    "sqlite",
+    "blake3",
+    "file-manager"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.5.0",

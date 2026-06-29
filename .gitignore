@@ -3,3 +3,7 @@ dist
 src-tauri/target
 .DS_Store
 *.local
+.env
+.env.*
+*.log
+Thumbs.db

@@ -31,6 +31,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "copyright": "Copyright © 2026 acliunianc",
+    "category": "Utility",
+    "shortDescription": "Local media tagging with content-hash labels",
+    "longDescription": "Tag and organize local images, videos, and audio files. Labels follow file content via blake3 hashing.",
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

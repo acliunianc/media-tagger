@@ -1,88 +1,103 @@
-# Role: 资深 Rust 桌面端研发工程师 & 高级测试专家
+# MediaTagger
 
-## Background
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/acliunianc/media-tagger)](https://github.com/acliunianc/media-tagger/releases)
+[![CI](https://github.com/acliunianc/media-tagger/actions/workflows/ci.yml/badge.svg)](https://github.com/acliunianc/media-tagger/actions/workflows/ci.yml)
 
-你需要协助我开发/测试一款名为 **MediaTagger** 的本地桌面端应用。
+基于 **Tauri v2 + React + Rust** 的本地媒体标签管理桌面应用。通过 **内容哈希（blake3）** 绑定标签，文件移动或重命名后标签依然跟随；数据纯本地存储，无需联网。
 
-该应用旨在对本地资源（视频、图片、音频等）进行高效的标签化管理，支持快速查找、分类与批量操作。
+[English](#english) · [下载安装](#下载安装) · [从源码构建](#从源码构建) · [发布流程](#发布流程)
 
-## Tech Stack & Architecture
+## 功能特性
 
-- **框架**: Tauri (支持 v1 或 v2 跨平台桌面应用框架)
-- **前端**: Web 技术栈 (推荐 React + TypeScript) 配合现代 UI 组件库 (如 Tailwind CSS / shadcn)
-- **后端 (Core)**: 纯 Rust 开发，基于 Tokio 运行时处理高并发异步计算任务，通过 Tauri IPC (Commands & Events) 与前端进行高效通信
-- **数据库**: 本地 SQLite（通过 Rust 后端操作，标签分类纯本地化，无服务端依赖）
+- **文件夹扫描**：多目录、通配符排除、进度推送、暂停/继续
+- **标签管理**：按内容哈希绑定，支持移动/重命名/恢复后自动关联
+- **搜索与筛选**：文件名/路径/标签搜索，AND/OR 逻辑，类型/状态/标签多维筛选
+- **文件夹树**：按扫描根目录浏览与过滤
+- **批量操作**：多选后右键批量添加/移除标签
+- **导入导出**：JSON 格式标签数据，支持合并与替换模式
+- **媒体预览**：图片全屏预览、视频全屏播放
+- **虚拟滚动**：海量文件列表流畅渲染
 
-## Core Mechanisms
+## 下载安装
 
-### 1. 唯一标识 (Content-based Identity)
+前往 [GitHub Releases](https://github.com/acliunianc/media-tagger/releases) 下载对应平台的安装包：
 
-- **主键**: 采用 `blake3` 哈希值（优先保证 Rust 端的计算性能）。
-- **计算策略**:
-  - 小文件（< 10MB）：全量计算哈希。
-  - 大文件（≥ 10MB）：采样计算（前 1MB + 中间 1MB + 最后 1MB）。
-- **缓存机制**: 计算结果存入 SQLite，基于文件修改时间（`modified_time`）判定缓存是否失效。
+| 平台 | 格式 |
+| ---- | ---- |
+| Windows | `.msi` / `.exe` |
+| macOS | `.dmg` / `.app` |
+| Linux | `.deb` / `.AppImage` |
 
-### 2. 被动修复与生命周期管理
+> 首次运行若遇系统安全提示，请允许来自该发布者的应用。
 
-- **标签跟随**: 核心设计理念。因哈希与内容绑定，文件移动、重命名或盘符改变，只要内容不变，标签永不丢失。
-- **软删除 (Soft Delete)**: 文件在磁盘上被删除或移动导致路径失效时，数据库记录不予物理删除，仅将状态标记为 `status=0`（丢失）。文件恢复后标签自动找回。
+## 从源码构建
 
-## UI & User Flow
+### 环境要求
 
-### 1. 扫描与检索
+- [Node.js](https://nodejs.org/) 18+
+- [pnpm](https://pnpm.io/) 9+
+- [Rust](https://www.rust-lang.org/tools/install) stable
+- 平台依赖见 [Tauri 官方文档](https://v2.tauri.app/start/prerequisites/)
 
-- **扫描配置**: 支持单选/多选/拖拽文件夹；支持通配符排除（如 `*.tmp`, `node_modules/`）。（前端通过 Tauri Dialog API 唤起原生文件选择器）
-- **搜索系统**: 顶部搜索框（支持布尔逻辑 `AND`/`OR`），配合多维筛选器（按标签/文件类型/大小/时间）。
-- **进度反馈**: Rust 后端实时通过 Tauri Event 向前端推送扫描/处理进度（已扫描数/总数），支持暂停与继续。
+### 开发
 
-### 2. 资源管理主界面
+```bash
+git clone https://github.com/acliunianc/media-tagger.git
+cd media-tagger
+pnpm install
+pnpm tauri dev
+```
 
-- **资源列表（左侧）**: 前端采用虚拟滚动（Virtual Scrolling，如 `react-window` 或 `vueuse`）以支撑海量文件；支持图标视图；支持 Ctrl/Shift 多选及拖拽框选。
-- **详情面板（右侧）**:
-  - 展示元数据（大小、路径、修改时间、哈希值）。
-  - 标签管理：显示已有标签（点击删除），输入新标签时提供自动补全。
-- **批量操作**: 选中多文件右键可触发批量添加/删除标签。
+### 打包
 
-## Test Scenarios (测试用例集)
+```bash
+pnpm tauri build
+```
 
-### 一、 基础场景（单文件）
+产物位于 `src-tauri/target/release/bundle/`。
 
-1. **新文件打标签**: 为新文件添加标签，验证数据库是否新增正确哈希及路径，且重新打开后标签保留。
-2. **叠加标签**: 给已有标签的文件新增标签，验证旧标签不丢失。
-3. **移除标签**: 删除指定标签，验证其余标签不受影响。
+## 发布流程
 
-### 二、 移动与重命名（核心）
+本项目通过 GitHub Actions 自动构建并发布到 **Releases**（非 npm Packages）。
 
-1. **跨目录移动**: 手动改变文件路径后在应用内查看，验证哈希匹配，标签跟随，路径更新。
-2. **原址重命名**: 修改文件名后查看，验证标签跟随。
-3. **移动并重命名**: 同时改变路径和文件名，验证标签依然精准跟随。
+1. 更新 `package.json`、`src-tauri/tauri.conf.json`、`src-tauri/Cargo.toml` 中的版本号
+2. 在 `CHANGELOG.md` 中记录变更
+3. 提交并推送 tag：
 
-### 三、 边界与冲突场景（高风险）
+```bash
+git add .
+git commit -m "chore: release v1.0.1"
+git tag v1.0.1
+git push origin main --tags
+```
 
-1. **同名文件替换**: 文件 A 被移除，下载了同名但内容不同的文件 B。验证 B 无旧标签，A 记录变为“丢失”。（*验证重点：标签随内容而非文件名*）
-2. **同内容副本**: 复制文件生成副本。给原件打标签，验证副本同样继承该标签（哈希一致）。
-3. **文件内容变更**: 修改文件内容（哈希改变）。验证原标签不再显示，且可为新状态的文件建立独立的新标签体系。
+4. GitHub Actions 会自动构建 Windows / macOS / Linux 安装包并创建 [Release](https://github.com/acliunianc/media-tagger/releases)
 
-### 四、 删除与恢复场景
+## 项目结构
 
-1. **文件删除**: 将文件移入回收站。验证应用内搜索该标签时，文件状态显示为“丢失”但记录保留。
-2. **文件恢复**: 从回收站还原文件。验证应用识别到有效路径，标签自动恢复可用状态。
+```
+media-tagger/
+├── src/                 # React 前端
+├── src-tauri/           # Rust 后端与 Tauri 配置
+├── .github/workflows/   # CI / Release 自动化
+└── docs/                # 开发文档
+```
 
-### 五、 批量与搜索场景
+## 贡献
 
-1. **标签交叉搜索**:
-   - 搜“A”出 A 集合，搜“B”出 B 集合。
-   - 搜“A + B”正确输出交集。
-2. **全局标签管理**: 重命名或删除某全局标签，验证所有关联该标签的文件均同步更新。
+欢迎提交 Issue 与 Pull Request。开发规格见 [docs/SPEC.md](docs/SPEC.md)。
 
-## QA Checklists (验证检查清单)
+## 许可证
 
-| **测试要点**       | **正确行为 (Expected)** | **常见错误 (Anti-Pattern)**  |
-| ------------------ | ----------------------- | ---------------------------- |
-| **文件移动**       | 标签始终跟随文件        | 路径变动导致标签丢失         |
-| **文件重命名**     | 标签始终跟随文件        | 文件名变动导致标签丢失       |
-| **同名不同内容**   | 标签**不**跟随          | 仅仅因为文件名相同就继承标签 |
-| **同内容不同名**   | 标签共享/跟随           | 相同文件却需要重新打标签     |
-| **文件内容被修改** | 视为新文件，旧标签脱离  | 修改内容后，旧标签依然残留   |
-| **删除后恢复文件** | 标签自动恢复            | 记录被彻底删除，标签丢失     |
+本项目采用 [MIT License](LICENSE) 开源，可免费使用、修改与分发。
+
+---
+
+## English
+
+**MediaTagger** is a cross-platform desktop app for tagging local media files (images, videos, audio). Tags are bound to file **content hashes (blake3)**, so they persist across moves and renames. All data stays on your machine.
+
+- **Download**: [GitHub Releases](https://github.com/acliunianc/media-tagger/releases)
+- **Build**: `pnpm install && pnpm tauri dev`
+- **License**: [MIT](LICENSE)

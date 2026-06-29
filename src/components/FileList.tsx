@@ -12,6 +12,8 @@ interface FileListProps {
   onSelect: (hash: string, ctrl: boolean, shift: boolean) => void;
   onDoubleClick: (hash: string) => void;
   filtered?: boolean;
+  /** 布局变化时触发列表高度重算（如筛选面板展开/收起） */
+  layoutKey?: string;
 }
 
 const ROW_HEIGHT = 56;
@@ -23,20 +25,25 @@ export default function FileList({
   onSelect,
   onDoubleClick,
   filtered = false,
+  layoutKey,
 }: FileListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(600);
+  const [height, setHeight] = useState(0);
   const lastClickedRef = useRef<string | null>(null);
 
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => {
-      setHeight(entry.contentRect.height);
-    });
+
+    const updateHeight = () => {
+      setHeight(Math.floor(el.getBoundingClientRect().height));
+    };
+
+    updateHeight();
+    const observer = new ResizeObserver(updateHeight);
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [layoutKey, files.length]);
 
   const Row = useCallback(
     ({ index, style }: { index: number; style: React.CSSProperties }) => {
@@ -48,7 +55,7 @@ export default function FileList({
       return (
         <div
           style={style}
-          className={`flex items-center gap-3 px-3 cursor-pointer border-b border-slate-800/50 transition-colors
+          className={`flex items-center gap-3 px-3 box-border cursor-pointer border-b border-slate-800/50 transition-colors
             ${isSelected ? "bg-accent/20" : "hover:bg-slate-800/40"}
             ${isActive ? "ring-1 ring-inset ring-accent/50" : ""}
             ${isLost ? "opacity-60" : ""}`}
@@ -87,7 +94,7 @@ export default function FileList({
 
   if (files.length === 0) {
     return (
-      <div className="flex-1 flex items-center justify-center text-slate-500">
+      <div className="flex-1 min-h-0 flex items-center justify-center text-slate-500">
         <div className="text-center">
           <File className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p>{filtered ? "没有匹配的文件" : "暂无文件"}</p>
@@ -100,10 +107,12 @@ export default function FileList({
   }
 
   return (
-    <div ref={containerRef} className="flex-1 overflow-hidden">
-      <List height={height} itemCount={files.length} itemSize={ROW_HEIGHT} width="100%">
-        {Row}
-      </List>
+    <div ref={containerRef} className="flex-1 min-h-0 overflow-hidden">
+      {height > 0 && (
+        <List height={height} itemCount={files.length} itemSize={ROW_HEIGHT} width="100%">
+          {Row}
+        </List>
+      )}
     </div>
   );
 }

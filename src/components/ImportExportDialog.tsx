@@ -178,7 +178,7 @@ export default function ImportExportDialog({
             <button
               onClick={handleImport}
               disabled={busy}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-sm transition-colors disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent hover:bg-accent-hover text-sm text-white transition-colors disabled:opacity-50"
             >
               <Upload className="w-4 h-4" />
               选择文件并导入

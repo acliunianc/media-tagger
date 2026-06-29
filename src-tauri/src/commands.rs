@@ -1,5 +1,5 @@
 use crate::db::Database;
-use crate::models::{BatchTagOp, ExportData, ExportSummary, ImportResult, MediaFile, ScanConfig, ScanProgress, SearchQuery, TagInfo};
+use crate::models::{BatchTagOp, ExportData, ExportSummary, FolderTreeSummary, ImportResult, MediaFile, ScanConfig, ScanProgress, SearchQuery, TagInfo};
 use crate::scanner::{scan_directory, ScanState};
 use parking_lot::Mutex;
 use std::path::PathBuf;
@@ -157,6 +157,12 @@ pub async fn start_scan(
     .map_err(|e| e.to_string())?;
 
     result
+}
+
+#[tauri::command]
+pub fn list_folder_tree(state: State<'_, AppState>) -> Result<FolderTreeSummary, String> {
+    let db = state.db.lock();
+    db.folder_tree_summary().map_err(|e| e.to_string())
 }
 
 #[tauri::command]

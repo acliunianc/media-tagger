@@ -36,6 +36,19 @@ export interface SearchQuery {
   max_size?: number;
   status?: number;
   has_tags?: boolean;
+  folder_path?: string;
+}
+
+export interface FolderNode {
+  path: string;
+  name: string;
+  file_count: number;
+  children: FolderNode[];
+}
+
+export interface FolderTreeSummary {
+  total_files: number;
+  roots: FolderNode[];
 }
 
 export interface BatchTagOp {

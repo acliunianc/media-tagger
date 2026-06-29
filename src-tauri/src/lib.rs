@@ -1,5 +1,6 @@
 mod commands;
 mod db;
+mod folder;
 mod hash;
 mod models;
 mod scanner;
@@ -29,6 +30,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::search_files,
             commands::get_file,
+            commands::list_folder_tree,
             commands::add_tag,
             commands::remove_tag,
             commands::batch_add_tags,

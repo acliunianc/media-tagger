@@ -111,6 +111,8 @@ where
     F: FnMut(usize, usize, &str, &str),
 {
     scan_state.reset();
+    db.add_scan_roots(&config.paths)
+        .map_err(|e| e.to_string())?;
     let files = collect_files(config);
     let total = files.len();
     let mut processed = 0usize;

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import FileList from "./components/FileList";
 import FileListFilter, { hasActiveFileFilters } from "./components/FileListFilter";
+import FolderTree from "./components/FolderTree";
 import DetailPanel from "./components/DetailPanel";
 import ScanDialog from "./components/ScanDialog";
 import TagManager from "./components/TagManager";
@@ -26,10 +27,11 @@ import {
   onScanProgress,
   reconcileFiles,
   listTags,
+  listFolderTree,
   batchAddTags,
   batchRemoveTags,
 } from "./api";
-import type { MediaFile, ScanProgress, TagInfo, FileTypeFilter, StatusFilter, TagPresenceFilter } from "./types";
+import type { MediaFile, ScanProgress, TagInfo, FolderNode, FileTypeFilter, StatusFilter, TagPresenceFilter } from "./types";
 
 export default function App() {
   const [files, setFiles] = useState<MediaFile[]>([]);
@@ -42,6 +44,9 @@ export default function App() {
   const [fileTypeFilter, setFileTypeFilter] = useState<FileTypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [tagPresenceFilter, setTagPresenceFilter] = useState<TagPresenceFilter>("all");
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [folderRoots, setFolderRoots] = useState<FolderNode[]>([]);
+  const [totalFileCount, setTotalFileCount] = useState(0);
   const [showListFilters, setShowListFilters] = useState(true);
   const [showScanDialog, setShowScanDialog] = useState(false);
   const [showTagManager, setShowTagManager] = useState(false);
@@ -83,13 +88,20 @@ export default function App() {
       file_types: fileTypes,
       status,
       has_tags: hasTags,
+      folder_path: selectedFolder ?? undefined,
     });
     setFiles(results);
-  }, [searchQuery, tagLogic, selectedTags, fileTypeFilter, statusFilter, tagPresenceFilter]);
+  }, [searchQuery, tagLogic, selectedTags, fileTypeFilter, statusFilter, tagPresenceFilter, selectedFolder]);
 
   const loadTags = useCallback(async () => {
     const t = await listTags();
     setTags(t);
+  }, []);
+
+  const loadFolderTree = useCallback(async () => {
+    const tree = await listFolderTree();
+    setFolderRoots(tree.roots);
+    setTotalFileCount(tree.total_files);
   }, []);
 
   useEffect(() => {
@@ -98,7 +110,8 @@ export default function App() {
 
   useEffect(() => {
     loadTags();
-  }, [loadTags]);
+    loadFolderTree();
+  }, [loadTags, loadFolderTree]);
 
   useEffect(() => {
     if (!toast) return;
@@ -115,12 +128,13 @@ export default function App() {
         setScanPaused(false);
         loadFiles();
         loadTags();
+        loadFolderTree();
       }
     }).then((fn) => {
       unlisten = fn;
     });
     return () => unlisten?.();
-  }, [loadFiles, loadTags]);
+  }, [loadFiles, loadTags, loadFolderTree]);
 
   const handleSelect = useCallback(
     (hash: string, ctrl: boolean, shift: boolean) => {
@@ -166,6 +180,7 @@ export default function App() {
 
   const handleReconcile = async () => {
     const count = await reconcileFiles();
+    loadFolderTree();
     if (count > 0) {
       loadFiles();
     }
@@ -343,12 +358,27 @@ export default function App() {
 
       {/* Main content */}
       <div className="flex flex-1 min-h-0 overflow-hidden" onContextMenu={handleContextMenu}>
+        <FolderTree
+          roots={folderRoots}
+          totalFiles={totalFileCount}
+          selectedFolder={selectedFolder}
+          onSelectFolder={setSelectedFolder}
+        />
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           <div className="flex items-center justify-between px-4 py-2 text-xs text-slate-500 border-b border-slate-800">
-            <span>
+            <span className="truncate min-w-0">
               {files.length} 个文件
               {selectedHashes.size > 0 && ` · 已选 ${selectedHashes.size}`}
               {listFiltersActive && " · 已筛选"}
+              {selectedFolder && (
+                <span className="text-slate-400">
+                  {" "}
+                  ·{" "}
+                  <span title={selectedFolder}>
+                    {selectedFolder.split(/[/\\]/).pop()}
+                  </span>
+                </span>
+              )}
             </span>
             <button
               onClick={() => setShowListFilters(!showListFilters)}
@@ -387,7 +417,7 @@ export default function App() {
             onSelect={handleSelect}
             onDoubleClick={setActiveHash}
             filtered={listFiltersActive || searchQuery.trim().length > 0}
-            layoutKey={showListFilters ? "open" : "closed"}
+            layoutKey={`${showListFilters ? "open" : "closed"}-${selectedFolder ?? "all"}`}
           />
         </div>
         <DetailPanel
@@ -472,6 +502,7 @@ export default function App() {
           setToast(message);
           loadTags();
           loadFiles();
+          loadFolderTree();
         }}
       />
 

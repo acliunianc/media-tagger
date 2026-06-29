@@ -51,6 +51,22 @@ pub struct SearchQuery {
     pub max_size: Option<i64>,
     pub status: Option<i32>,
     pub has_tags: Option<bool>,
+    pub folder_path: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FolderNode {
+    pub path: String,
+    pub name: String,
+    pub file_count: u32,
+    #[serde(default)]
+    pub children: Vec<FolderNode>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct FolderTreeSummary {
+    pub total_files: u32,
+    pub roots: Vec<FolderNode>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

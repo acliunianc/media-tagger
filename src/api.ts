@@ -3,6 +3,7 @@ import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import type {
   BatchTagOp,
   ExportSummary,
+  FolderTreeSummary,
   ImportMode,
   ImportResult,
   MediaFile,
@@ -38,6 +39,10 @@ export async function batchRemoveTags(op: BatchTagOp): Promise<void> {
 
 export async function listTags(): Promise<TagInfo[]> {
   return invoke("list_tags");
+}
+
+export async function listFolderTree(): Promise<FolderTreeSummary> {
+  return invoke("list_folder_tree");
 }
 
 export async function suggestTags(prefix: string): Promise<string[]> {

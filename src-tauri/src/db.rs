@@ -62,6 +62,11 @@ impl Database {
                 modified_time INTEGER NOT NULL
             );
 
+            CREATE TABLE IF NOT EXISTS scan_roots (
+                path TEXT PRIMARY KEY,
+                added_at INTEGER NOT NULL
+            );
+
             CREATE INDEX IF NOT EXISTS idx_files_status ON files(status);
             CREATE INDEX IF NOT EXISTS idx_files_path ON files(path);
             CREATE INDEX IF NOT EXISTS idx_file_tags_hash ON file_tags(file_hash);
@@ -69,6 +74,29 @@ impl Database {
             ",
         )?;
         Ok(())
+    }
+
+    pub fn add_scan_roots(&self, paths: &[String]) -> Result<(), DbError> {
+        let now = Utc::now().timestamp();
+        for path in paths {
+            let root = normalize_scan_root(path);
+            if root.is_empty() {
+                continue;
+            }
+            self.conn.execute(
+                "INSERT OR IGNORE INTO scan_roots (path, added_at) VALUES (?1, ?2)",
+                params![root, now],
+            )?;
+        }
+        Ok(())
+    }
+
+    pub fn list_scan_roots(&self) -> Result<Vec<String>, DbError> {
+        let mut stmt = self.conn.prepare("SELECT path FROM scan_roots ORDER BY path")?;
+        let roots = stmt
+            .query_map([], |row| row.get(0))?
+            .collect::<Result<Vec<String>, _>>()?;
+        Ok(roots)
     }
 
     pub fn get_cached_hash(&self, path: &str, modified_time: i64) -> Result<Option<String>, DbError> {
@@ -294,6 +322,17 @@ impl Database {
             bind_values.push(Box::new(search));
         }
 
+        if let Some(ref folder) = query.folder_path {
+            if !folder.is_empty() {
+                let folder = folder.trim_end_matches(['\\', '/']);
+                let pat_backslash = format!("{}\\%", folder);
+                let pat_slash = format!("{}/%", folder);
+                conditions.push("(f.path LIKE ? OR f.path LIKE ?)".into());
+                bind_values.push(Box::new(pat_backslash));
+                bind_values.push(Box::new(pat_slash));
+            }
+        }
+
         let where_clause = if conditions.is_empty() {
             String::new()
         } else {
@@ -505,6 +544,19 @@ impl Database {
         Ok(updated)
     }
 
+    pub fn folder_tree_summary(&self) -> Result<crate::models::FolderTreeSummary, DbError> {
+        let roots = crate::folder::build_folder_tree(&self.conn)?;
+        let total_files: u32 = self.conn.query_row(
+            "SELECT COUNT(*) FROM files WHERE path != ''",
+            [],
+            |row| row.get::<_, i64>(0),
+        )? as u32;
+        Ok(crate::models::FolderTreeSummary {
+            total_files,
+            roots,
+        })
+    }
+
     pub fn export_tag_data(&self) -> Result<ExportData, DbError> {
         let mut stmt = self.conn.prepare(
             "SELECT f.hash, f.filename, f.file_type, t.name
@@ -659,3 +711,18 @@ impl Database {
         })
     }
 }
+
+fn normalize_scan_root(path: &str) -> String {
+    let path = path.trim();
+    if path.is_empty() {
+        return String::new();
+    }
+    let p = PathBuf::from(path);
+    let root = if p.is_file() {
+        p.parent().map(|d| d.to_path_buf()).unwrap_or(p)
+    } else {
+        p
+    };
+    root.to_string_lossy().trim_end_matches(['\\', '/']).to_string()
+}
+
